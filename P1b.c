@@ -44,7 +44,7 @@ int main (int argc, const char * argv[]) {
 
 	int32_t* BaseAddr = (int32_t*)(&Data[0][0][0]);
 	int32_t* ElementAddr; 
-	/*
+	
 	printf("Starting Address Traces 1\n");
 	FILE *file1 = fopen("AddressTraces1.txt", "wbt");
 
@@ -78,17 +78,15 @@ int main (int argc, const char * argv[]) {
 	fclose(file2);
 
 	sleep(1);
-	*/
-	sleep(1);
 
 	printf("Starting Address Traces 3\n");
 	FILE *file3 = fopen("AddressTraces3.txt", "wbt");
-
 
 	int tempPlanes[NbrPlanes];
 	int tempRows[NbrRows];
 	int tempCols[NbrCols];
 
+	//Initialize integer arrays for shuffling
 	for(I = 0; I < NbrPlanes; I++) {
 		NbrPlanesArr[I] = I;
 	}
@@ -99,6 +97,7 @@ int main (int argc, const char * argv[]) {
 		NbrColsArr[I] = I;
 	}
 
+	//Randomly shuffle the arrays
 	shuffleArray(NbrPlanesArr, NbrPlanes);
 	shuffleArray(NbrRowsArr, NbrRows);
 	shuffleArray(NbrColsArr, NbrCols);
@@ -112,40 +111,5 @@ int main (int argc, const char * argv[]) {
 		}
 	}
 
-	/*
-	int32_t ArraySize = NbrPlanes;
-
-	for(I = 0; I < NbrPlanes; I++) {
-		int r = rand() % ArraySize;
-		int32_t temp[ArraySize--];
-		for(J = 0; J < ArraySize; J++) {
-			temp[J] = 
-		}
-		ArraySize--;
-	}
-	*/
-
-	//std::random_shuffle(&NbrPlanesArr[0],&NbrPlanesArr[NbrPlanes-1]);
-
-	/*
-	srand(time(NULL));
-
-	int r1 = rand() % NbrPlanes;
-
-	for(I = 0; I < NbrPlanes; I++) {
-		for(J = 0; J < NbrRows; J++) {
-			for(K = 0; K < NbrCols; K++) {
-				Accessed[r1][r2][r3] = 1;
-				ElementAddr = (int32_t*)(&Data[r1][r2][r3] - BaseAddr);
-				fwrite(&ElementAddr, 4, 1, file3);
-			}
-		}
-	}
-	*/
-
-	//////////////////////////////////////
-
-
 	return(1);
-
 }
