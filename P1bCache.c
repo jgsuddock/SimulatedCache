@@ -66,11 +66,17 @@ Cache createCache(int cacheSize, int blockSize) {
 	cache->numLines = (int)(cacheSize / blockSize);
 
 	cache->blocks = (Block*) malloc( sizeof(Block) * cache->numLines );
+	if(cache->blocks != NULL) {
+		fputs ("Blocks Memory Allocation Error: ", stderr);
+		return 0;
+	}
+	cache->blocks[i]->valid = 0;
 
 	for(I = 0; I < cache->numLines; i++) {
 		cache->blocks[i] = (Block) malloc( sizeof( struct Block_ ) );
 		if(cache->blocks[i] != NULL) {
-			
+			fputs ("Blocks Memory Allocation Error: ", stderr);
+			return 0;
 		}
 		cache->blocks[i]->valid = 0;
 		cache->blocks[i]->tag = NULL;
