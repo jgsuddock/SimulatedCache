@@ -19,7 +19,7 @@
 typedef struct Cache_* Cache;
 typedef struct Block_* Block;
 
-Cache createCache(int cache_size, int block_size);
+Cache createCache(int cacheSize, int blockSize);
  
 void destroyCache(Cache cache);
 
