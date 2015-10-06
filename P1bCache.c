@@ -19,33 +19,10 @@ struct Cache_ {
     Block* blocks;    
 };
 
-unsigned int hexToDecimal (const char str[]) {
-
-	unsigned int result = 0;
-	int sub = 0;	
-	int i, j;
-
-	for(i = 4; i > 0; i--) {
-		for(j = 1; j > -1; j--) {
-			sub = j;
-			if(i < 3) {
-				sub++;
-			}
-			result = result * 16;
-			if(str[i*2 - sub] >= '0' && str[i*2 - sub] <= '9')
-			{
-				result = result + (str[i*2 - sub] - '0');
-			}
-			else if(str[i*2 - sub] >= 'a' && str[i*2 - sub] <= 'f')
-			{
-				result = result + (str[i*2 - sub] - 'a') + 10;
-			}
-		}
-	}
-
-	return result;
-
-}
+struct bin
+{
+	int32_t* x;
+};
 
 int binToDecimal (char *bin) {
 
@@ -70,8 +47,7 @@ char *decToBinary(unsigned int num) {
 	int i;
 	    
 	binStr = (char*) malloc(sizeof(char) * 33);
-	//assert(binStr != NULL); //Needed?
-	    
+	
 	binStr[32] = '\0';
 	    
 	for(i = 0; i < 32; i++ ) {
@@ -137,68 +113,28 @@ char *getData(char *binStr) {
 
 }
 
-int main(int argc, char const *argv[])
-{
-
-	if(argc < 2) {
-		printf("Missing Arguments (./Program traceFilename.txt)");
-		return 0;
-	}
-
-	//Using Read Instructions from http://www.cplusplus.com/reference/cstdio/fread/
-	FILE * tracefile;
-	int lSize;
-	char * tracebuffer;
-	size_t result;
-
-	Cache cache;
-	char * address;
-
-	tracefile = fopen ( argv[1] , "rbt" );
-	if (tracefile == NULL) {
-		fputs ("Open File Error: ",stderr);
-		return 0;
-	}
-
-	fseek (tracefile , 0 , SEEK_END); //Pull file size
-	lSize = ftell (tracefile);
-	rewind (tracefile);
-
-	//Allocate Memory for File
-	tracebuffer = (char*) malloc (sizeof(char)*lSize);
-	if (tracebuffer == NULL) {
-		fputs ("Memory Allocation Error: ", stderr);
-		return 0;
-	}
-
-	// File put in buffer:
-	result = fread (tracebuffer, 1, lSize, tracefile);
-	if (result != lSize) {
-		fputs ("File Read Error: ", stderr);
-		return 0;
-	}
-
-	cache = createCache(CACHE_SIZE, BLOCK_SIZE);
-
+int main(int argc, char const *argv[]) {
+    Cache cache;
+    FILE *file;
 	int i = 0;
-	int counter;
+	struct bin buffer;
+   
+    file = fopen( argv[1], "r" );
 
-	while(i < lSize) {
-		counter = i%9;
-		address[counter] = tracebuffer[i];
-		if(counter == 0 && i != 0) {
-			read(cache, address);
-		}
-		i++;
-	}
+    cache = createCache(CACHE_SIZE, BLOCK_SIZE);
 
-	// terminate
-	fclose (tracefile);
-	free (tracebuffer);
+    while(fread(&buffer, sizeof(struct bin), 1, file)) {
+		read(cache, *buffer.x);
+    }
 
-	printf("Cache:\n\tCACHE HITS: %i\n\tCACHE MISSES: %i\n\tCACHE SIZE: %i Bytes\n\tBLOCK SIZE: %i Bytes\n\tNUM LINES: %i\n", cache->hits, cache->misses, cache->cacheSize, cache->blockSize, cache->numLines);
+  	printf("CACHE HITS: %i\nCACHE MISSES: %i\n", cache->hits, cache->misses);
+  
+    fclose(file);
+    destroyCache(cache);
+    cache = NULL;
+    
+    return 1;
 
-	return 0;
 }
 
 Cache createCache(int cacheSize, int blockSize) {
@@ -218,14 +154,14 @@ Cache createCache(int cacheSize, int blockSize) {
 	cache->numLines = (int)(CACHE_SIZE / BLOCK_SIZE);
 
 	cache->blocks = (Block*) malloc( sizeof(Block) * cache->numLines );
-	if(cache->blocks != NULL) {
+	if(cache->blocks == NULL) {
 		fputs ("Blocks X Memory Allocation Error: ", stderr);
 		return 0;
 	}
 
 	for(i = 0; i < cache->numLines; i++) {
 		cache->blocks[i] = (Block) malloc( sizeof( struct Block_ ) );
-		if(cache->blocks[i] != NULL) {
+		if(cache->blocks[i] == NULL) {
 			fputs ("Blocks Y Memory Allocation Error: ", stderr);
 			return 0;
 		}
@@ -236,9 +172,8 @@ Cache createCache(int cacheSize, int blockSize) {
 	return cache;
 }
 
-void read(Cache cache, char* address) {
+void read(Cache cache, int dec) {
 	
-	unsigned int dec = hexToDecimal(address);
 	char *addr = decToBinary(dec);
 	char *tag = getTag(addr);
 	char *index = getIndex(addr);
