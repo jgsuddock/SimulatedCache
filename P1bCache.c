@@ -1,19 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <ctype.h>
 #include "P1bCache.h"
 
 struct Block_ {
-	char *tag;    
+	char* tag;    
 	int valid;
 };
 
 struct Cache_ {
     int hits;
     int misses;
-    int cache_size;
-    int block_size;
+    int cacheSize;
+    int blockSize;
     int numLines;
     Block* blocks;    
 };
@@ -62,10 +63,10 @@ int binToDecimal (char *bin) {
 }
 
 char *decToBinary(unsigned int num) {
-	char* binStr[33];
+	char* binStr;
 	int bitState;
 	    
-	//binStr = (char*) malloc(sizeof(char) * 33);
+	binStr = (char*) malloc(sizeof(char) * 33);
 	//assert(binStr != NULL); //Needed?
 	    
 	binStr[32] = '\0';
@@ -140,12 +141,15 @@ int main(int argc, char const *argv[])
 
 	//Using Read Instructions from http://www.cplusplus.com/reference/cstdio/fread/
 	FILE * tracefile;
-	long lSize;
+	int lSize;
 	char * tracebuffer;
 	size_t result;
 
-	pFile = fopen ( argv[1] , "rb" );
-	if (pFile == NULL) {
+	Cache cache;
+	char * address;
+
+	tracefile = fopen ( argv[1] , "rbt" );
+	if (tracefile == NULL) {
 		fputs ("Open File Error: ",stderr);
 		return 0;
 	}
@@ -162,24 +166,38 @@ int main(int argc, char const *argv[])
 	}
 
 	// File put in buffer:
-	result = fread (tracebuffer, 1, lSize, pFile);
+	result = fread (tracebuffer, 1, lSize, tracefile);
 	if (result != lSize) {
 		fputs ("File Read Error: ", stderr);
 		return 0;
+	}
+
+	cache = createCache(CACHE_SIZE, BLOCK_SIZE);
+
+	int i = 0;
+	int counter;
+
+	while(i < lSize) {
+		counter = i%9;
+		address[counter] = tracebuffer[i];
+		if(counter == 0 && i != 0) {
+			read(cache, address);
+		}
+		i++;
 	}
 
 	// terminate
 	fclose (tracefile);
 	free (tracebuffer);
 
-	printf("Cache:\n\tCACHE HITS: %i\n\tCACHE MISSES: %i\n\tCACHE SIZE: %i Bytes\n\tBLOCK SIZE: %i Bytes\n\tNUM LINES: %i\n", cache->hits, cache->misses, cache->cache_size, cache->block_size, cache->numLines);
+	printf("Cache:\n\tCACHE HITS: %i\n\tCACHE MISSES: %i\n\tCACHE SIZE: %i Bytes\n\tBLOCK SIZE: %i Bytes\n\tNUM LINES: %i\n", cache->hits, cache->misses, cache->cacheSize, cache->blockSize, cache->numLines);
 
 	return 0;
 }
 
 Cache createCache(int cacheSize, int blockSize) {
 	Cache cache;
-	int I;
+	int i;
 
 	cache = (Cache) malloc( sizeof( struct Cache_ ) );
 	if (cache == NULL) {
@@ -189,22 +207,20 @@ Cache createCache(int cacheSize, int blockSize) {
 
 	cache->hits = 0;
 	cache->misses = 0;
-	cache->cacheSize = cacheSize;
-	cache->blockSize = blockSize;
-
-	cache->numLines = (int)(cacheSize / blockSize);
+	cache->cacheSize = CACHE_SIZE;
+	cache->blockSize = BLOCK_SIZE;
+	cache->numLines = (int)(CACHE_SIZE / BLOCK_SIZE);
 
 	cache->blocks = (Block*) malloc( sizeof(Block) * cache->numLines );
 	if(cache->blocks != NULL) {
-		fputs ("Blocks Memory Allocation Error: ", stderr);
+		fputs ("Blocks X Memory Allocation Error: ", stderr);
 		return 0;
 	}
-	cache->blocks[i]->valid = 0;
 
-	for(I = 0; I < cache->numLines; i++) {
+	for(i = 0; i < cache->numLines; i++) {
 		cache->blocks[i] = (Block) malloc( sizeof( struct Block_ ) );
 		if(cache->blocks[i] != NULL) {
-			fputs ("Blocks Memory Allocation Error: ", stderr);
+			fputs ("Blocks Y Memory Allocation Error: ", stderr);
 			return 0;
 		}
 		cache->blocks[i]->valid = 0;
@@ -221,8 +237,9 @@ void read(Cache cache, char* address) {
 	char *tag = getTag(addr);
 	char *index = getIndex(addr);
 	char *data = getData(addr);
+	int indexDec = binToDecimal(index);
 
-	Block block = cache->blocks[index];
+	Block block = cache->blocks[indexDec];
 	if(block->valid == 1 && strcmp(block->tag, tag) == 0) {
 		cache->hits++;
     		free(tag);

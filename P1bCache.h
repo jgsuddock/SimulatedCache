@@ -1,12 +1,12 @@
  
-#ifndef SWIFT_SIM_H_
-#define SWIFT_SIM_H_
+#ifndef P1BCACHE_H
+#define P1BCACHE_H
 
 /* Max Line Length in Trace */
-#define LINELENGTH 128
+// #define LINELENGTH 128
 
 /* Cache Sizes (in bytes) */
-#define CACHE_SIZE 16384
+#define CACHE_SIZE 32768
 #define BLOCK_SIZE 4 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Block Sizes */
@@ -19,10 +19,10 @@
 typedef struct Cache_* Cache;
 typedef struct Block_* Block;
 
-Cache createCache(int cache_size, int block_size, int write_policy);
+Cache createCache(int cache_size, int block_size);
  
 void destroyCache(Cache cache);
 
-int read(Cache cache, char* address);
+void read(Cache cache, char* address);
 
 #endif
