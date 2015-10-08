@@ -46,10 +46,12 @@ int main (int argc, const char * argv[]) {
 
 	sleep(1);
 
+	//Defining and initializing base address
 	int32_t* BaseAddr = (int32_t*)(&Data[0][0][0]);
 	int32_t* ElementAddr; 
 	
 	printf("Starting Address Trace 1\n");
+	// Create/open file
 	FILE *file1 = fopen("AddressTraces1.txt", "wbt");
 
 	for(I = 0; I < NbrPlanes; I++) {
@@ -57,6 +59,7 @@ int main (int argc, const char * argv[]) {
 			for(K = 0; K < NbrCols; K++) {
 				X = Data[I][J][K];
 				ElementAddr = (int32_t*)(&Data[I][J][K] - BaseAddr);
+				//Write the address to the file
 				fwrite(&ElementAddr, 4, 1, file1);
 			}
 		}
@@ -67,6 +70,7 @@ int main (int argc, const char * argv[]) {
 	sleep(1);
 
 	printf("Starting Address Trace 2\n");
+	// Create/open file
 	FILE *file2 = fopen("AddressTraces2.txt", "wbt");
 
 	for(K = 0; K < NbrCols; K++) {
@@ -74,6 +78,7 @@ int main (int argc, const char * argv[]) {
 			for(I = 0; I < NbrPlanes; I++) {
 				X = Data[I][J][K];
 				ElementAddr = (int32_t*)(&Data[I][J][K] - BaseAddr);
+				//Write the address to the file
 				fwrite(&ElementAddr, 4, 1, file2);
 			}
 		}
