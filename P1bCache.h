@@ -2,18 +2,15 @@
 #ifndef P1BCACHE_H
 #define P1BCACHE_H
 
-/* Max Line Length in Trace */
-// #define LINELENGTH 128
-
-/* Cache Sizes (in bytes) */
+// Cache Sizes (in bytes)
 #define CACHE_SIZE 32768
-#define BLOCK_SIZE 4 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define BLOCK_SIZE 4
 #define LINE_SIZE 8192 
 
-/* Block Sizes */
-#define TAG 17 /* 18 + 0 = 18 */
-#define INDEX 9 /* 18 + 12 = 30 */
-#define OFFSET 6 /* 30 + 2 = 32 */
+// Block Sizes
+#define TAG 17
+#define INDEX 9
+#define OFFSET 6
 
 
 // Typedefs
