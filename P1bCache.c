@@ -144,30 +144,30 @@ char *getData(char *binStr) {
  */
 
 int main(int argc, char const *argv[]) {
-    Cache cache;
-    FILE *file;
+    	Cache cache;
+    	FILE *file;
 	int i = 0;
 	struct bin buffer;
    
 	//Starts file stream with address trace
-    file = fopen( argv[1], "r" );
+    	file = fopen( argv[1], "r" );
 
-    //Defines cache constructor
-    cache = create(CACHE_SIZE, BLOCK_SIZE);
-
-    //Reads each line of the file into the buffer structure
-    while(fread(&buffer, sizeof(struct bin), 1, file)) {
+	//Defines cache constructor
+	cache = create(CACHE_SIZE, BLOCK_SIZE);
+	
+	//Reads each line of the file into the buffer structure
+	while(fread(&buffer, sizeof(struct bin), 1, file)) {
 		read(cache, *buffer.x);
-    }
-
-  	printf("CACHE HITS: %i\nCACHE MISSES: %i\n", cache->hits, cache->misses);
-  
-  	//Calls Destructors
-    fclose(file);
-    destroyCache(cache);
-    cache = NULL;
-    
-    return 1;
+	}
+	
+	printf("CACHE HITS: %i\nCACHE MISSES: %i\n", cache->hits, cache->misses);
+	  
+	//Calls Destructors
+	fclose(file);
+	destroyCache(cache);
+	cache = NULL;
+	    
+	return 1;
 
 }
 
