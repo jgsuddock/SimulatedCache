@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "P1bCache.h"
 
-//Used in cache allocation
+//Defined data types used in cache allocation
 struct Block_ {
 	char* tag;    
 	int valid;
@@ -26,8 +26,8 @@ struct bin
 };
 
 /*
- * Inputs binary number
- * Returns decimal form of number
+ * Inputs binary number (as a char array)
+ * Returns decimal form of the number (as an integer)
  */
 int binToDecimal (char *bin) {
 
@@ -48,7 +48,7 @@ int binToDecimal (char *bin) {
 
 /*
  * Inputs decimal number
- * Returns binary form of number
+ * Returns binary form of number (as a char array)
  */
 char *decToBinary(unsigned int num) {
 	char* binStr;
@@ -72,15 +72,17 @@ char *decToBinary(unsigned int num) {
 }
 
 /*
- * Returns tag of address
+ * Inputs the binary address (as a char array)
+ * Returns tag bits of address
  */
 char *getTag(char *binStr) {
 	
 	int i;
 	char *tag;
+	// Allocates variable holder to hold tag value.
 	tag = (char *) malloc(sizeof(char) * 18);
 	
-	tag[17] = '\0';
+	tag[17] = '\0'; // End of array
 	
 	for(i = 0; i < 17; i++)
 	{
@@ -92,7 +94,8 @@ char *getTag(char *binStr) {
 }
 
 /*
- * Returns index of address
+ * Inputs the binary address (as a char array)
+ * Returns line index bits of address
  */
 char *getIndex(char *binStr) {
 	
@@ -113,13 +116,14 @@ char *getIndex(char *binStr) {
 }
 
 /*
- * Returns data of address
+ * Inputs the binary address (as a char array)
+ * Returns data bits of address
  */
 char *getData(char *binStr) {
 	
 	int i;
 	char *data;
-	// Alocates variable holder to hold return data
+	// Alocates variable holder to hold data value
 	data = (char *) malloc(sizeof(char) * 7);
 	
 	data[6] = '\0';
@@ -211,27 +215,35 @@ Cache create(int cacheSize, int blockSize) {
 	return cache;
 }
 
-
+/*
+ * Read method to read the address passed and simulate cache behavior.
+ */
 void read(Cache cache, int dec) {
 	
+	// Get the needed information from the passed address.
 	char *addr = decToBinary(dec);
 	char *tag = getTag(addr);
 	char *index = getIndex(addr);
 	char *data = getData(addr);
 	int indexDec = binToDecimal(index);
 
+	// Get the block with that line index number.
 	Block block = cache->blocks[indexDec];
+	// Compare the tag and check if it is valid.
+	// If both are true, then it's a hit.
+	// If not, then it's a miss.
 	if(block->valid == 1 && strcmp(block->tag, tag) == 0) {
 		cache->hits++;
     		free(tag);
 	} else {
 		cache->misses++;
 		
+		// Replace the tag of this block with the new tag.
 		if(block->tag != NULL) {
 			free(block->tag);
 		}
 		block->tag = tag;
-		block->valid = 1;
+		block->valid = 1; // Make the block valid after reading it in.
 	}		
 	
 	free(addr);
