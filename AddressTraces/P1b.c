@@ -15,8 +15,12 @@ int32_t NbrPlanesArr[NbrPlanes];
 int32_t NbrRowsArr[NbrRows];
 int32_t NbrColsArr[NbrCols];
 
+/*
+ * Used in random address trace
+ */
 void shuffleArray(int *array, int size) {
 	int I;
+	//Shuffles the array into a random order
 	for (I = 0; I < size - 1; I++) {
 		int temp = I + rand() / (RAND_MAX / (size - I) + 1);
 		int t = array[temp];
@@ -45,7 +49,7 @@ int main (int argc, const char * argv[]) {
 	int32_t* BaseAddr = (int32_t*)(&Data[0][0][0]);
 	int32_t* ElementAddr; 
 	
-	printf("Starting Address Traces 1\n");
+	printf("Starting Address Trace 1\n");
 	FILE *file1 = fopen("AddressTraces1.txt", "wbt");
 
 	for(I = 0; I < NbrPlanes; I++) {
@@ -62,7 +66,7 @@ int main (int argc, const char * argv[]) {
 
 	sleep(1);
 
-	printf("Starting Address Traces 2\n");
+	printf("Starting Address Trace 2\n");
 	FILE *file2 = fopen("AddressTraces2.txt", "wbt");
 
 	for(K = 0; K < NbrCols; K++) {
@@ -79,7 +83,7 @@ int main (int argc, const char * argv[]) {
 
 	sleep(1);
 
-	printf("Starting Address Traces 3\n");
+	printf("Starting Address Trace 3\n");
 	FILE *file3 = fopen("AddressTraces3.txt", "wbt");
 
 	int tempPlanes[NbrPlanes];
@@ -97,11 +101,13 @@ int main (int argc, const char * argv[]) {
 		NbrColsArr[I] = I;
 	}
 
-	//Randomly shuffle the arrays
+	// Randomly shuffle the arrays
 	shuffleArray(NbrPlanesArr, NbrPlanes);
 	shuffleArray(NbrRowsArr, NbrRows);
 	shuffleArray(NbrColsArr, NbrCols);
 
+	// Shuffles array based on the row, column, and plane indexing shuffled above.
+	// Shuffles based on cols, and then rows, and finally planes
 	for(I = 0; I < NbrPlanes; I++) {
 		for(J = 0; J < NbrRows; J++) {
 			for(K = 0; K < NbrCols; K++) {
