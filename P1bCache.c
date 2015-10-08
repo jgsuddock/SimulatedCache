@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "P1bCache.h"
 
+//Used in cache allocation
 struct Block_ {
 	char* tag;    
 	int valid;
@@ -24,6 +25,10 @@ struct bin
 	int32_t* x;
 };
 
+/*
+ * Inputs binary number
+ * Returns decimal form of number
+ */
 int binToDecimal (char *bin) {
 
 	int lengthBin = strlen(bin);
@@ -41,6 +46,10 @@ int binToDecimal (char *bin) {
 
 }
 
+/*
+ * Inputs decimal number
+ * Returns binary form of number
+ */
 char *decToBinary(unsigned int num) {
 	char* binStr;
 	int bitState;
@@ -62,6 +71,9 @@ char *decToBinary(unsigned int num) {
 	return binStr;
 }
 
+/*
+ * Returns tag of address
+ */
 char *getTag(char *binStr) {
 	
 	int i;
@@ -79,10 +91,14 @@ char *getTag(char *binStr) {
 
 }
 
+/*
+ * Returns index of address
+ */
 char *getIndex(char *binStr) {
 	
 	int i;
 	char *index;
+	// Allocates variable holder to hold index value.
 	index = (char *) malloc(sizeof(char) * 10);
 	
 	index[9] = '\0';
@@ -96,10 +112,14 @@ char *getIndex(char *binStr) {
 
 }
 
+/*
+ * Returns data of address
+ */
 char *getData(char *binStr) {
 	
 	int i;
 	char *data;
+	// Alocates variable holder to hold return data
 	data = (char *) malloc(sizeof(char) * 7);
 	
 	data[6] = '\0';
@@ -113,22 +133,32 @@ char *getData(char *binStr) {
 
 }
 
+/*
+ * Main:
+ * 
+ * Reads file and defines cache constructor
+ */
+
 int main(int argc, char const *argv[]) {
     Cache cache;
     FILE *file;
 	int i = 0;
 	struct bin buffer;
    
+	//Starts file stream with address trace
     file = fopen( argv[1], "r" );
 
-    cache = createCache(CACHE_SIZE, BLOCK_SIZE);
+    //Defines cache constructor
+    cache = create(CACHE_SIZE, BLOCK_SIZE);
 
+    //Reads each line of the file into the buffer structure
     while(fread(&buffer, sizeof(struct bin), 1, file)) {
 		read(cache, *buffer.x);
     }
 
   	printf("CACHE HITS: %i\nCACHE MISSES: %i\n", cache->hits, cache->misses);
   
+  	//Calls Destructors
     fclose(file);
     destroyCache(cache);
     cache = NULL;
@@ -137,40 +167,50 @@ int main(int argc, char const *argv[]) {
 
 }
 
-Cache createCache(int cacheSize, int blockSize) {
+/*
+ * Cache constructor allocating blocks within.
+ */
+Cache create(int cacheSize, int blockSize) {
 	Cache cache;
 	int i;
 
+	//Allocating memory for cache
 	cache = (Cache) malloc( sizeof( struct Cache_ ) );
 	if (cache == NULL) {
 		fputs ("Cache Memory Allocation Error: ", stderr);
 		return 0;
 	}
 
+	//Initializing Cache Variables
 	cache->hits = 0;
 	cache->misses = 0;
-	cache->cacheSize = CACHE_SIZE;
+	cache->cacheSize = CACHE_SIZE; //Defined in header
 	cache->blockSize = BLOCK_SIZE;
 	cache->numLines = (int)(CACHE_SIZE / BLOCK_SIZE);
 
+	//Allocates memory for the cache blocks.
 	cache->blocks = (Block*) malloc( sizeof(Block) * cache->numLines );
 	if(cache->blocks == NULL) {
-		fputs ("Blocks X Memory Allocation Error: ", stderr);
+		fputs ("Blocks Memory Allocation Error: ", stderr);
 		return 0;
 	}
 
+	//Allocates memory for each cache block defined previously (numLines allocations)
 	for(i = 0; i < cache->numLines; i++) {
 		cache->blocks[i] = (Block) malloc( sizeof( struct Block_ ) );
 		if(cache->blocks[i] == NULL) {
-			fputs ("Blocks Y Memory Allocation Error: ", stderr);
+			printf("Block %i Memory Allocation Error\n", i);
+			fputs ("Error: ", stderr);
 			return 0;
 		}
+		//Initialize block variables
 		cache->blocks[i]->valid = 0;
 		cache->blocks[i]->tag = NULL;
 	}
 
 	return cache;
 }
+
 
 void read(Cache cache, int dec) {
 	
@@ -200,6 +240,11 @@ void read(Cache cache, int dec) {
 
 }
 
+/*
+ * Destructor for Cache constructor
+ * 
+ * Removes each row of blocks and finally removes the cache.
+ */
 void destroyCache(Cache cache) {
 	
 	int i;

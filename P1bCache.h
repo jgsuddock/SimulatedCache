@@ -17,10 +17,18 @@
 typedef struct Cache_* Cache;
 typedef struct Block_* Block;
 
+/*
+ * Cache constructor allocating blocks within.
+ */
 Cache createCache(int cacheSize, int blockSize);
  
-void destroyCache(Cache cache);
-
 void read(Cache cache, int dec);
+
+/*
+ * Destructor for Cache constructor
+ * 
+ * Removes each row of blocks and finally removes the cache.
+ */
+void destroyCache(Cache cache);
 
 #endif
