@@ -217,6 +217,7 @@ Cache create(int cacheSize, int blockSize) {
 
 /*
  * Read method to read the address passed and simulate cache behavior.
+ * Inputs the cache being used and dec, which is the address being read (integer).
  */
 void read(Cache cache, int dec) {
 	
